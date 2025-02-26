@@ -1,56 +1,76 @@
-// Register User
-function registerUser(event) {
-    event.preventDefault(); // Prevent form from reloading the page
+document.addEventListener("DOMContentLoaded", function () {
+    let user = localStorage.getItem("loggedInUser");
+    if (document.getElementById("user-name") && user) {
+        document.getElementById("user-name").textContent = user;
+    }
+});
 
-    let name = document.getElementById("name").value;
+function registerUser(event) {
+    event.preventDefault();
+    
+    let name = document.getElementById("register-name").value;
     let email = document.getElementById("register-email").value;
     let password = document.getElementById("register-password").value;
 
-    if (!name || !email || !password) {
-        document.getElementById("register-error").innerText = "All fields are required!";
-        return false;
+    if (!/[!@#$%^&*]/.test(password) || password.length < 8) {
+        alert("Password must be at least 8 characters and contain a symbol.");
+        return;
     }
 
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userPassword", password);
+    let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    alert("Registration successful! Please log in.");
-    window.location.href = "login.html";
+    if (users.some(user => user.email === email)) {
+        alert("This email is already registered. Try another one.");
+        return;
+    }
+
+    users.push({ name, email, password });
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Registration successful! You can now log in.");
+    window.location.href = "index.html";
 }
 
-// Login User
 function loginUser(event) {
-    event.preventDefault(); // Prevent page refresh
+    event.preventDefault();
 
     let email = document.getElementById("login-email").value;
     let password = document.getElementById("login-password").value;
+    let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    let storedEmail = localStorage.getItem("userEmail");
-    let storedPassword = localStorage.getItem("userPassword");
-
-    if (email === storedEmail && password === storedPassword) {
-        localStorage.setItem("loggedIn", "true"); // Set session
-        alert("Login successful!");
+    let user = users.find(user => user.email === email && user.password === password);
+    if (user) {
+        localStorage.setItem("loggedInUser", user.name);
         window.location.href = "welcome.html";
     } else {
-        document.getElementById("login-error").innerText = "Invalid email or password.";
+        alert("Invalid email or password!");
     }
 }
 
-// Check if user is logged in (on Welcome Page)
-function checkAuth() {
-    let isLoggedIn = localStorage.getItem("loggedIn");
-    if (isLoggedIn !== "true") {
-        window.location.href = "login.html";
-    } else {
-        document.getElementById("user-name").innerText = localStorage.getItem("userName");
+function resetPassword(event) {
+    event.preventDefault();
+
+    let email = document.getElementById("reset-email").value;
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    
+    let user = users.find(user => user.email === email);
+    if (!user) {
+        alert("No account found with this email.");
+        return;
     }
+
+    let newPassword = prompt("Enter a new password (8+ characters, 1 symbol):");
+    if (!/[!@#$%^&*]/.test(newPassword) || newPassword.length < 8) {
+        alert("Weak password! Please try again.");
+        return;
+    }
+
+    user.password = newPassword;
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Password reset successful! You can now log in.");
+    window.location.href = "index.html";
 }
 
-// Logout function
 function logout() {
-    localStorage.removeItem("loggedIn"); // Remove session
-    alert("Logged out successfully!");
-    window.location.href = "login.html";
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
 }

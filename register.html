@@ -9,20 +9,14 @@
 <body>
     <div class="container">
         <h2>Register</h2>
-        <form onsubmit="return registerUser(event)">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="register-email" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="register-password" required>
-            
+        <form onsubmit="registerUser(event)">
+            <input type="text" id="register-name" placeholder="Full Name" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Password" required>
             <button type="submit">Register</button>
         </form>
-        <p id="register-error" class="error-message"></p>
-        <p>Already have an account? <a href="login.html">Login here</a></p>
+        <p id="register-error" class="error"></p>
+        <p>Already have an account? <a href="index.html">Login</a></p>
     </div>
     <script src="script.js"></script>
 </body>
